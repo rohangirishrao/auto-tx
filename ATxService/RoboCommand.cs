@@ -182,6 +182,13 @@ namespace ATxService
                     Log.Trace("++++ new file transfer started: size [{0}], already transferred [{1}] ++++",
                         _txCurFileSize, _status.TransferredBytesCompleted);
                 }
+
+                // "same" happens when resuming an interrupted transfer, for files that were already
+                // transferred completely before the interruption. RoboCopy skips them, so they are
+                // only added to the list of transferred files (their bytes were already counted):
+                if (processed.FileClass.ToLower().Equals("same")) {
+                    _transferredFiles.Add($"{processed.Name} ({Conv.BytesToString(processed.Size)})");
+                }
             }
             catch (Exception ex) {
                 Log.Error("Error in RsFileProcessed(): {0}", ex.Message);
